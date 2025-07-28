@@ -45,3 +45,30 @@ config: {'project_name': 'fed-talos-baseline', 'entity': 's297466-politecnico-di
 2025-07-28 13:05:06,313 INFO    MainThread:43974 [wandb_init.py:_resume_backend():551] [no run ID] resuming backend
 2025-07-28 13:05:06,424 INFO    MainThread:43974 [jupyter.py:save_ipynb():384] [no run ID] not saving jupyter notebook
 2025-07-28 13:05:06,424 INFO    MainThread:43974 [wandb_init.py:_pause_backend():546] [no run ID] pausing backend
+2025-07-28 13:06:41,937 INFO    MainThread:43974 [wandb_init.py:_resume_backend():551] [no run ID] resuming backend
+2025-07-28 13:06:41,988 INFO    MainThread:43974 [jupyter.py:save_ipynb():384] [no run ID] not saving jupyter notebook
+2025-07-28 13:06:41,988 INFO    MainThread:43974 [wandb_init.py:_pause_backend():546] [no run ID] pausing backend
+2025-07-28 13:07:28,145 INFO    MainThread:43974 [wandb_init.py:_resume_backend():551] [no run ID] resuming backend
+2025-07-28 13:07:28,198 INFO    MainThread:43974 [jupyter.py:save_ipynb():384] [no run ID] not saving jupyter notebook
+2025-07-28 13:07:28,198 INFO    MainThread:43974 [wandb_init.py:_pause_backend():546] [no run ID] pausing backend
+2025-07-28 13:07:51,243 INFO    MainThread:43974 [wandb_init.py:_resume_backend():551] [no run ID] resuming backend
+2025-07-28 13:07:51,245 INFO    MainThread:43974 [jupyter.py:save_ipynb():384] [no run ID] not saving jupyter notebook
+2025-07-28 13:07:51,247 INFO    MainThread:43974 [wandb_init.py:_pause_backend():546] [no run ID] pausing backend
+2025-07-28 13:07:54,259 INFO    MainThread:43974 [wandb_init.py:_resume_backend():551] [no run ID] resuming backend
+2025-07-28 13:07:54,319 INFO    MainThread:43974 [jupyter.py:save_ipynb():384] [no run ID] not saving jupyter notebook
+2025-07-28 13:07:54,320 INFO    MainThread:43974 [wandb_init.py:_pause_backend():546] [no run ID] pausing backend
+2025-07-28 13:07:58,757 INFO    MainThread:43974 [wandb_init.py:_resume_backend():551] [no run ID] resuming backend
+2025-07-28 13:07:58,762 INFO    MainThread:43974 [jupyter.py:save_ipynb():384] [no run ID] not saving jupyter notebook
+2025-07-28 13:07:58,763 INFO    MainThread:43974 [wandb_init.py:_pause_backend():546] [no run ID] pausing backend
+2025-07-28 13:08:03,140 INFO    MainThread:43974 [wandb_init.py:_resume_backend():551] [no run ID] resuming backend
+2025-07-28 13:08:03,155 INFO    MainThread:43974 [jupyter.py:save_ipynb():384] [no run ID] not saving jupyter notebook
+2025-07-28 13:08:03,158 INFO    MainThread:43974 [wandb_init.py:_pause_backend():546] [no run ID] pausing backend
+2025-07-28 13:08:06,639 INFO    MainThread:43974 [wandb_init.py:_resume_backend():551] [no run ID] resuming backend
+2025-07-28 13:08:06,642 INFO    MainThread:43974 [jupyter.py:save_ipynb():384] [no run ID] not saving jupyter notebook
+2025-07-28 13:08:06,642 INFO    MainThread:43974 [wandb_init.py:_pause_backend():546] [no run ID] pausing backend
+2025-07-28 13:08:12,998 INFO    MainThread:43974 [wandb_init.py:_resume_backend():551] [no run ID] resuming backend
+2025-07-28 13:08:13,045 INFO    MainThread:43974 [jupyter.py:save_ipynb():384] [no run ID] not saving jupyter notebook
+2025-07-28 13:08:13,045 INFO    MainThread:43974 [wandb_init.py:_pause_backend():546] [no run ID] pausing backend
+2025-07-28 13:08:20,347 INFO    MainThread:43974 [wandb_init.py:_resume_backend():551] [no run ID] resuming backend
+2025-07-28 13:08:20,404 INFO    MainThread:43974 [jupyter.py:save_ipynb():384] [no run ID] not saving jupyter notebook
+2025-07-28 13:08:20,405 INFO    MainThread:43974 [wandb_init.py:_pause_backend():546] [no run ID] pausing backend
