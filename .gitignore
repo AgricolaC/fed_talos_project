@@ -1,0 +1,38 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# W&B local run logs
+wandb/
+
+# VS Code config
+.vscode/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Environment / dependency files
+.env
+*.egg-info/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# PyTorch / experiment outputs
+*.pt
+*.pth
+*.ckpt
+checkpoints/
+
+# Pytest cache
+.pytest_cache/
+
+# Colab downloads
+*.ipynb.json
+
+# Misc
+*.bak
+*.swp
+*.tmp
