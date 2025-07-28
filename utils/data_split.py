@@ -6,7 +6,7 @@ from collections import defaultdict
 import random
 
 def load_cifar100(data_root= './data', val_split = 0.1):
-    train_transform = transforms.compose([
+    train_transform = transforms.Compose([
         transforms.RandomResizedCrop(224, scale=(0.5, 1.0)),  # DINO ViT expects 224x224 input
         transforms.RandomHorizontalFlip(),
         transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.1),
