@@ -1,3 +1,0 @@
-Current directory: /Users/berkcalisir/fed_talos_project/experiment_notebooks
-Files: ['federated_baseline.ipynb', 'centralized_baseline.ipynb', 'model_editing.ipynb', 'wandb']
-Imported from: /Users/berkcalisir/fed_talos_project/utils/wandb_logger.py
