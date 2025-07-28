@@ -1,0 +1,26 @@
+2025-07-28 12:54:45,833 INFO    MainThread:43974 [wandb_setup.py:_flush():67] Current SDK version is 0.19.9
+2025-07-28 12:54:45,833 INFO    MainThread:43974 [wandb_setup.py:_flush():67] Configure stats pid to 43974
+2025-07-28 12:54:45,833 INFO    MainThread:43974 [wandb_setup.py:_flush():67] Loading settings from /Users/berkcalisir/.config/wandb/settings
+2025-07-28 12:54:45,833 INFO    MainThread:43974 [wandb_setup.py:_flush():67] Loading settings from /Users/berkcalisir/fed_talos_project/experiment_notebooks/wandb/settings
+2025-07-28 12:54:45,833 INFO    MainThread:43974 [wandb_setup.py:_flush():67] Loading settings from environment variables
+2025-07-28 12:54:45,833 INFO    MainThread:43974 [wandb_init.py:setup_run_log_directory():662] Logging user logs to /Users/berkcalisir/fed_talos_project/experiment_notebooks/wandb/run-20250728_125445-i9eou68n/logs/debug.log
+2025-07-28 12:54:45,833 INFO    MainThread:43974 [wandb_init.py:setup_run_log_directory():663] Logging internal logs to /Users/berkcalisir/fed_talos_project/experiment_notebooks/wandb/run-20250728_125445-i9eou68n/logs/debug-internal.log
+2025-07-28 12:54:45,833 INFO    MainThread:43974 [wandb_init.py:monkeypatch_ipython():581] configuring jupyter hooks <wandb.sdk.wandb_init._WandbInit object at 0x3026c5a00>
+2025-07-28 12:54:45,834 INFO    MainThread:43974 [wandb_init.py:init():781] calling init triggers
+2025-07-28 12:54:45,834 INFO    MainThread:43974 [wandb_init.py:init():786] wandb.init called with sweep_config: {}
+config: {'project_name': 'fed-talos-baseline', 'entity': 's297466-politecnico-di-torino', 'model': 'DINO_ViT-S/16', 'epochs': 50, 'batch_size': 128, 'lr': 0.01, 'momentum': 0.9, 'weight_decay': '5e-4', 'scheduler': 'cosine', 'dataset': 'CIFAR-100', 'val_split': 0.1, 'num_classes': 100, '_wandb': {}}
+2025-07-28 12:54:45,834 INFO    MainThread:43974 [wandb_init.py:init():809] starting backend
+2025-07-28 12:54:45,834 INFO    MainThread:43974 [wandb_init.py:init():813] sending inform_init request
+2025-07-28 12:54:45,862 INFO    MainThread:43974 [backend.py:_multiprocessing_setup():101] multiprocessing start_methods=spawn,fork,forkserver, using: spawn
+2025-07-28 12:54:45,862 INFO    MainThread:43974 [wandb_init.py:init():823] backend started and connected
+2025-07-28 12:54:45,867 INFO    MainThread:43974 [wandb_run.py:_label_probe_notebook():1267] probe notebook
+2025-07-28 12:54:45,868 INFO    MainThread:43974 [wandb_init.py:init():915] updated telemetry
+2025-07-28 12:54:45,885 INFO    MainThread:43974 [wandb_init.py:init():939] communicating run to backend with 90.0 second timeout
+2025-07-28 12:54:49,750 INFO    MainThread:43974 [wandb_init.py:init():1014] starting run threads in backend
+2025-07-28 12:54:50,067 INFO    MainThread:43974 [wandb_run.py:_console_start():2454] atexit reg
+2025-07-28 12:54:50,067 INFO    MainThread:43974 [wandb_run.py:_redirect():2306] redirect: wrap_raw
+2025-07-28 12:54:50,068 INFO    MainThread:43974 [wandb_run.py:_redirect():2371] Wrapping output streams.
+2025-07-28 12:54:50,068 INFO    MainThread:43974 [wandb_run.py:_redirect():2394] Redirects installed.
+2025-07-28 12:54:50,070 INFO    MainThread:43974 [wandb_init.py:init():1056] run started, returning control to user process
+2025-07-28 12:54:50,072 INFO    MainThread:43974 [jupyter.py:save_ipynb():384] [no run ID] not saving jupyter notebook
+2025-07-28 12:54:50,072 INFO    MainThread:43974 [wandb_init.py:_pause_backend():546] [no run ID] pausing backend
