@@ -66,13 +66,15 @@ def train(config):
         val_loss, val_acc = evaluate(model, val_loader, device)
         val_accs.append(val_acc)
         val_losses.append(val_loss)
-        lrs.append(scheduler.get_last_lr()[0])
+        current_lr = scheduler.get_last_lr()[0] if scheduler else config["lr"]
+        lrs.append(current_lr)
+
 
         epoch_duration = time.time() - start_time
         epoch_times.append(epoch_duration)
         eta = (sum(epoch_times) / len(epoch_times)) * (config["epochs"] - epoch - 1)
 
-        log_metrics(epoch, train_loss, train_acc, val_loss, val_acc, scheduler.get_last_lr()[0], epoch_duration, eta, config)
+        log_metrics(epoch, train_loss, train_acc, val_loss, val_acc, current_lr, epoch_duration, eta, config)
 
         if val_acc > best_val_acc:
             best_val_acc = val_acc
@@ -85,7 +87,9 @@ def train(config):
         if (epoch + 1) % 5 == 0:
             print(f"Checkpoint saved at epoch {epoch + 1}")
 
-        scheduler.step()
+        if scheduler:
+            scheduler.step()
+
 
     # Final test evaluation
     test_loss, test_acc = evaluate(model, test_loader, device)
