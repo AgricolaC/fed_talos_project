@@ -15,7 +15,7 @@ frozen_backbone: True
 
 
 # save and load paths
-data_root: "./data"
-log_dir: "./logs"
-wandb_dir: "./logs/wandb"
-checkpoint_path: "./logs/best_model.pth"
+data_root: "../data"
+log_dir: "../logs"
+wandb_dir: "../logs/wandb"
+checkpoint_path: "../logs/best_model.pth"
