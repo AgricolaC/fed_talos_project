@@ -1,25 +1,26 @@
 project_name: fed-talos-baseline
 entity: s297466-politecnico-di-torino
 use_wandb: False
-seed: 42 # random seed for reproducibility
-
-
+seed: 42 
 model: DINO_ViT-S/16
 dataset: CIFAR-100
+
+# training parameters
 epochs: 15
 batch_size: 64
 lr: 0.005
 momentum: 0.9
 weight_decay: 0.0005
 scheduler: cosine # options: "cosine", "step", "linear", "none"
+warmup_epochs: 3
 val_split: 0.1
 num_classes: 100
 frozen_backbone: True
 
 
 # save and load paths
-data_root: "../data"
-log_dir: "../logs"
-wandb_dir: "../logs/wandb"
-checkpoint_path: "../logs/best_model.pth"
+data_root: "./data"
+log_dir: "./logs"
+wandb_dir: "./logs/wandb"
+checkpoint_path: "./logs/best_model.pth"
 use_checkpoint: False
