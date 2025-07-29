@@ -56,7 +56,7 @@ def train(config):
     print(f"Using scheduler: {config['scheduler']} with initial learning rate: {config['lr']}")
     
     best_val_acc = 0.0
-    epoch_times, val_accs, val_losses = [], [], []
+    epoch_times, val_accs, val_losses, lrs = [], [], [], []
 
     # Training loop
     for epoch in range(config["epochs"]):
@@ -66,6 +66,7 @@ def train(config):
         val_loss, val_acc = evaluate(model, val_loader, device)
         val_accs.append(val_acc)
         val_losses.append(val_loss)
+        lrs.append(scheduler.get_last_lr()[0])
 
         epoch_duration = time.time() - start_time
         epoch_times.append(epoch_duration)
@@ -93,14 +94,14 @@ def train(config):
     # Plotting results
     if not config["use_wandb"]:
         plt.figure(figsize=(12, 6))
-        plt.plot(val_loss)
+        plt.plot(val_losses)
         plt.title("Validation Loss over Epochs")
         plt.xlabel("Epoch")
         plt.ylabel("Val Loss")
         plt.grid(True)
         plt.savefig("val_loss.png")
         plt.show()
-    if not config["use_wandb"]:
+
         plt.figure(figsize=(12, 6))
         plt.plot(val_accs)
         plt.title("Validation Accuracy over Epochs")
@@ -108,6 +109,15 @@ def train(config):
         plt.ylabel("Val Accuracy")
         plt.grid(True)
         plt.savefig("val_accuracy.png")
+        plt.show()
+
+        plt.figure(figsize=(12, 6))
+        plt.plot(lrs)
+        plt.title("Learning Rate per Epoch")
+        plt.xlabel("Epoch")
+        plt.ylabel("Learning Rate")
+        plt.grid(True)
+        plt.savefig("lr_schedule.png")
         plt.show()
 
     return test_acc
