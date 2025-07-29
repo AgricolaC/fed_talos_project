@@ -5,31 +5,36 @@ from torch.utils.data import Subset, random_split
 from collections import defaultdict
 import random
 
-def load_cifar100(data_root= './data', val_split = 0.1):
+def load_cifar100(data_root='./data', val_split=0.1):
+    # Normalization values for CIFAR-100
+    mean = (0.507, 0.487, 0.441)
+    std = (0.267, 0.256, 0.276)
+
     train_transform = transforms.Compose([
-        transforms.RandomResizedCrop(112, scale=(0.5, 1.0)), # DINO ViT expects 224x224 input, but because of memory constraints, we use 112x112
+        transforms.RandomResizedCrop(112, scale=(0.6, 1.0)),  # tighter scale to preserve spatial integrity
         transforms.RandomHorizontalFlip(),
-        transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.1),
-        transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.1),
+        transforms.ColorJitter(0.3, 0.3, 0.3, 0.05),
         transforms.ToTensor(),
-        transforms.Normalize((0.507, 0.487, 0.441), (0.267, 0.256, 0.276))
+        transforms.Normalize(mean, std)
     ])
+
     test_transform = transforms.Compose([
-        transforms.Resize(256),
-    transforms.CenterCrop(224),
-    transforms.ToTensor(),
-    transforms.Normalize((0.507, 0.487, 0.441), (0.267, 0.256, 0.276))
+        transforms.Resize(128),
+        transforms.CenterCrop(112),
+        transforms.ToTensor(),
+        transforms.Normalize(mean, std)
     ])
-    
-    full_train = datasets.CIFAR100(root=data_root, train= True, download= True, transform= train_transform)
-    test_set = datasets.CIFAR100(root=data_root, train= False, download= True, transform= test_transform)
-    
+
+    full_train = datasets.CIFAR100(root=data_root, train=True, download=True, transform=train_transform)
+    test_set = datasets.CIFAR100(root=data_root, train=False, download=True, transform=test_transform)
+
     val_len = int(len(full_train) * val_split)
-    train_len = len(full_train) - val_len   
+    train_len = len(full_train) - val_len
     train_set, val_set = random_split(full_train, [train_len, val_len])
-    
+
+    # Apply test_transform to val set (not augmented)
     val_set.dataset.transform = test_transform
-    
+
     return train_set, val_set, test_set
 
 def iid_partition(dataset, num_clients):

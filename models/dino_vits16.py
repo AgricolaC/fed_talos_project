@@ -8,26 +8,29 @@ class DINO_ViT(nn.Module):
         
         self.backbone = torch.hub.load('facebookresearch/dino:main', 'dino_vits16', pretrained=pretrained)
 
-        # freeze backbone (or not)
         if frozen_backbone:
-            for param in self.model.parameters():
+            for param in self.backbone.parameters():
                 param.requires_grad = False
-        # classification head
+
         self.classifier = nn.Sequential(
-                            nn.Dropout(p=head_dropout),
-                            nn.Linear(384, num_classes) # 384 is the output dimension of dino_vits16
+            nn.Dropout(p=head_dropout),
+            nn.Linear(384, num_classes)  # DINO ViT-S/16 output dim
         )
+
     def forward_features(self, x):
         return self.backbone(x)
+
     def forward(self, x):
         x = self.forward_features(x)
         x = self.classifier(x)
         return x
+
     def freeze_backbone(self):
         for param in self.backbone.parameters():
-            param.requires_grad = False            
+            param.requires_grad = False
+
     def unfreeze_backbone(self):
         for param in self.backbone.parameters():
             param.requires_grad = True
-            
+
             
