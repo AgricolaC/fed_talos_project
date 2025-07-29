@@ -13,7 +13,7 @@ def init_wandb(config):
         project=config["project_name"],
         entity=config["entity"],
         config=config,
-        name=f"{config['model']}_lr{config['lr']}_bs{config['batch_size']}"
+        name=f"{config['model']}_lr{config['lr']}_bs{config['batch_size']}",
         dir=config.get("wandb_dir", "./logs/wandb"),
     )
     return wandb.config
