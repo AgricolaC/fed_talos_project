@@ -3,7 +3,7 @@ entity: s297466-politecnico-di-torino
 
 model: DINO_ViT-S/16
 epochs: 50
-batch_size: 128
+batch_size: 32
 lr: 0.01
 momentum: 0.9
 weight_decay: 0.0005
