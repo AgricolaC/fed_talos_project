@@ -8,6 +8,8 @@ from project_utils.data_split import load_cifar100
 from project_utils.train_utils import train_one_epoch, evaluate
 from project_utils.wandb_logger import log_metrics
 import os
+from pathlib import Path
+
 
 def get_scheduler(optimizer, scheduler_type, config):
     if scheduler_type == "cosine":
@@ -29,8 +31,15 @@ def train(config):
         device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
     
     print(f"Using device: {device}")
-    print(f"Data root: {config['data_root']} | Logs: {config['log_dir']} | Checkpoint: {config['checkpoint_path']}")
+    
+    # Resolve paths
+    checkpoint_path = Path(config["checkpoint_path"]).resolve()
+    log_dir = Path(config["log_dir"]).resolve()
+    wandb_dir = Path(config["wandb_dir"]).resolve()
+    data_root = Path(config["data_root"]).resolve()
 
+    print(f"Data: {data_root} | Logs: {log_dir} | Checkpoint: {checkpoint_path}")
+    
     train_set, val_set, test_set = load_cifar100(data_root= config["data_root"], val_split=config["val_split"])
     train_loader = DataLoader(train_set, batch_size=config["batch_size"], shuffle=True)
     val_loader = DataLoader(val_set, batch_size=config["batch_size"])
@@ -40,9 +49,9 @@ def train(config):
     print(f"Model initialized with {sum(p.numel() for p in model.parameters() if p.requires_grad)} trainable parameters.")
     print(f"Frozen backbone: {config.get('frozen_backbone', False)}")
     
-    if config.get("use_checkpoint", False) and os.path.exists(config["checkpoint_path"]):
-        print(f"Resuming from checkpoint: {config['checkpoint_path']}")
-        model.load_state_dict(torch.load(config["checkpoint_path"]))
+    if config.get("use_checkpoint", False) and checkpoint_path.exists():
+        print(f"Resuming from checkpoint: {checkpoint_path}")
+        model.load_state_dict(torch.load(checkpoint_path))
     
     optimizer = torch.optim.SGD(
         model.parameters(),
@@ -72,9 +81,10 @@ def train(config):
         if val_acc > best_val_acc:
             best_val_acc = val_acc
             print(f"Best model updated at epoch {epoch + 1} with Val Acc = {val_acc:.4f}")
-            # Ensure checkpoint directory exists
-            os.makedirs(os.path.dirname(config["checkpoint_path"]), exist_ok=True)
-            torch.save(model.state_dict(), config["checkpoint_path"])
+            model_tag = log_dir / f"model_epoch{epoch + 1}_valacc{val_acc:.4f}.pth"
+            model_tag.parent.mkdir(parents=True, exist_ok=True)
+            torch.save(model.state_dict(), model_tag)
+            torch.save(model.state_dict(), checkpoint_path)
 
         if (epoch + 1) % 5 == 0:
             print(f"Checkpoint saved at epoch {epoch + 1}")
