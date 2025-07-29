@@ -1,6 +1,9 @@
 project_name: fed-talos-baseline
 entity: s297466-politecnico-di-torino
 use_wandb: False
+seed: 42 # random seed for reproducibility
+
+
 model: DINO_ViT-S/16
 dataset: CIFAR-100
 epochs: 15
