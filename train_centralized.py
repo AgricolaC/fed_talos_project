@@ -7,7 +7,7 @@ from models.dino_vits16 import DINO_ViT
 from project_utils.data_split import load_cifar100
 from project_utils.train_utils import train_one_epoch, evaluate
 from project_utils.wandb_logger import log_metrics
-
+import os
 
 def get_scheduler(optimizer, scheduler_type, config):
     if scheduler_type == "cosine":
@@ -20,6 +20,7 @@ def get_scheduler(optimizer, scheduler_type, config):
         return None
     else:
         raise ValueError(f"Unknown scheduler type: {scheduler_type}")
+    print(f"Using scheduler: {scheduler_type} with parameters: {config.get(scheduler_type, {})}")
 
 
 def train(config):
@@ -39,6 +40,10 @@ def train(config):
     print(f"Model initialized with {sum(p.numel() for p in model.parameters() if p.requires_grad)} trainable parameters.")
     print(f"Frozen backbone: {config.get('frozen_backbone', False)}")
     
+    if config.get("use_checkpoint", False) and os.path.exists(config["checkpoint_path"]):
+        print(f"Resuming from checkpoint: {config['checkpoint_path']}")
+        model.load_state_dict(torch.load(config["checkpoint_path"]))
+    
     optimizer = torch.optim.SGD(
         model.parameters(),
         lr=config["lr"],
@@ -46,7 +51,8 @@ def train(config):
         weight_decay=config["weight_decay"]
     )
     scheduler = get_scheduler(optimizer, config["scheduler"], config)
-
+    print(f"Using scheduler: {config['scheduler']} with initial learning rate: {config['lr']}")
+    
     best_val_acc = 0.0
     epoch_times, val_accs = [], []
 
@@ -66,6 +72,8 @@ def train(config):
         if val_acc > best_val_acc:
             best_val_acc = val_acc
             print(f"Best model updated at epoch {epoch + 1} with Val Acc = {val_acc:.4f}")
+            # Ensure checkpoint directory exists
+            os.makedirs(os.path.dirname(config["checkpoint_path"]), exist_ok=True)
             torch.save(model.state_dict(), config["checkpoint_path"])
 
         if (epoch + 1) % 5 == 0:
