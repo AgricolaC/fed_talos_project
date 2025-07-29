@@ -11,7 +11,7 @@ batch_size: 64
 lr: 0.005
 momentum: 0.9
 weight_decay: 0.0005
-scheduler: none # options: "cosine", "step", "linear", "none"
+scheduler: cosine # options: "cosine", "step", "linear", "none"
 warmup_epochs: 5
 val_split: 0.1
 num_classes: 100
