@@ -1,16 +1,12 @@
-# train_centralized.py
-
 import torch
 import time
-import wandb
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
-from torch.optim.lr_scheduler import CosineAnnealingLR, StepLR
+from torch.optim.lr_scheduler import CosineAnnealingLR, StepLR, LinearLR
 from models.dino_vits16 import DINO_ViT
 from project_utils.data_split import load_cifar100
 from project_utils.train_utils import train_one_epoch, evaluate
-from project_utils.wandb_logger import init_wandb, log_metrics
-from config import config
+from project_utils.wandb_logger import log_metrics
 
 
 def get_scheduler(optimizer, scheduler_type, config):
@@ -18,21 +14,31 @@ def get_scheduler(optimizer, scheduler_type, config):
         return CosineAnnealingLR(optimizer, T_max=config["epochs"])
     elif scheduler_type == "step":
         return StepLR(optimizer, step_size=10, gamma=0.5)
+    elif scheduler_type == "linear":
+        return LinearLR(optimizer, start_factor=1.0, end_factor=0.1, total_iters=config["epochs"])
+    elif scheduler_type == "none":
+        return None
     else:
         raise ValueError(f"Unknown scheduler type: {scheduler_type}")
 
 
-def train():
-    device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
-    print(f"🚀 Using device: {device}")
+def train(config):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    if device.type == "cpu" and torch.backends.mps.is_available():
+        device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+    
+    print(f"Using device: {device}")
+    print(f"Data root: {config['data_root']} | Logs: {config['log_dir']} | Checkpoint: {config['checkpoint_path']}")
 
-    train_set, val_set, test_set = load_cifar100()
+    train_set, val_set, test_set = load_cifar100(data_root= config["data_root"], val_split=config["val_split"])
     train_loader = DataLoader(train_set, batch_size=config["batch_size"], shuffle=True)
     val_loader = DataLoader(val_set, batch_size=config["batch_size"])
     test_loader = DataLoader(test_set, batch_size=config["batch_size"])
 
-    model = DINO_ViT(num_classes=100, frozen_backbone=config["frozen_backbone"]).to(device)
-
+    model = DINO_ViT(num_classes=config["num_classes"], frozen_backbone=config.get("frozen_backbone", False)).to(device)
+    print(f"Model initialized with {sum(p.numel() for p in model.parameters() if p.requires_grad)} trainable parameters.")
+    print(f"Frozen backbone: {config.get('frozen_backbone', False)}")
+    
     optimizer = torch.optim.SGD(
         model.parameters(),
         lr=config["lr"],
@@ -40,9 +46,6 @@ def train():
         weight_decay=config["weight_decay"]
     )
     scheduler = get_scheduler(optimizer, config["scheduler"], config)
-
-    if config["use_wandb"]:
-        init_wandb(config)
 
     best_val_acc = 0.0
     epoch_times, val_accs = [], []
@@ -62,20 +65,17 @@ def train():
 
         if val_acc > best_val_acc:
             best_val_acc = val_acc
-            print(f"📌 Best model updated at epoch {epoch + 1} with Val Acc = {val_acc:.4f}")
+            print(f"Best model updated at epoch {epoch + 1} with Val Acc = {val_acc:.4f}")
+            torch.save(model.state_dict(), config["checkpoint_path"])
 
         if (epoch + 1) % 5 == 0:
-            print(f"💾 Checkpoint saved at epoch {epoch + 1}")
+            print(f"Checkpoint saved at epoch {epoch + 1}")
 
         scheduler.step()
 
     # Final test evaluation
     test_loss, test_acc = evaluate(model, test_loader, device)
-    if config["use_wandb"]:
-        wandb.log({"test_loss": test_loss, "test_acc": test_acc})
-        wandb.finish()
-
-    print(f"\n✅ TRAINING COMPLETED | Final Test Accuracy: {test_acc:.4f} | Total Time: {sum(epoch_times)/60:.2f} min")
+    print(f"\n TRAINING COMPLETED | Final Test Accuracy: {test_acc:.4f} | Total Time: {sum(epoch_times)/60:.2f} min")
 
     if not config["use_wandb"]:
         plt.plot(val_accs)
@@ -86,6 +86,4 @@ def train():
         plt.savefig("val_accuracy.png")
         plt.show()
 
-
-if __name__ == "__main__":
-    train()
+    return test_acc
