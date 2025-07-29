@@ -1,14 +1,13 @@
 project_name: fed-talos-baseline
 entity: s297466-politecnico-di-torino
-
+use_wandb: True
 model: DINO_ViT-S/16
-epochs: 50
-batch_size: 32
-lr: 0.01
+dataset: CIFAR-100
+epochs: 15
+batch_size: 64
+lr: 0.005
 momentum: 0.9
 weight_decay: 0.0005
-scheduler: cosine
-
-dataset: CIFAR-100
+scheduler: cosine # options: "cosine", "step", "linear", "none"
 val_split: 0.1
 num_classes: 100
