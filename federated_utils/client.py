@@ -45,7 +45,7 @@ class Client:
             momentum=self.config["momentum"],
             weight_decay=self.config["weight_decay"]
         )
-        scheduler = get_scheduler(optimizer, self.config["scheduler"], self.config)
+        scheduler = get_scheduler(optimizer, self.config["scheduler"], cfg={ "warmup_steps": 2, "total_steps": self.config["local_steps"] })
 
         # 2) local epochs
         for step in range(self.config["local_steps"]):
