@@ -4,7 +4,6 @@ use_wandb: False
 seed: 42 
 model: DINO_ViT-S/16
 dataset: CIFAR-100
-device: mps
 
 # training parameters
 epochs: 15
