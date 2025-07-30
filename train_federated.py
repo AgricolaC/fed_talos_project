@@ -4,7 +4,8 @@ from project_utils.data_split  import load_cifar100, iid_partition, noniid_parti
 from federated_utils.client   import Client
 from federated_utils.server   import Server
 from project_utils.train_utils import seed_all
-from project_utils.model_registry import MODEL_REGISTRY 
+from project_utils.model_registry import MODEL_REGISTRY
+from torch.utils.data import Subset
 
 def train_federated(config):
     seed_all(config.get("seed",42))
@@ -39,16 +40,26 @@ def train_federated(config):
     train_set, val_set, test_set = load_cifar100(config["data_root"], config["val_split"])
     split = config.get("data_split","iid").lower()
     if split == "iid":
-        client_datasets = iid_partition(train_set, config["num_clients"])
+        client_indices = iid_partition(train_set, config["num_clients"])
     elif split == "noniid":
-        client_datasets = noniid_partition(train_set,
+        client_indices = noniid_partition(train_set,
                                            config["num_clients"],
                                            config["classes_per_client"])
     else:
         raise ValueError(f"[Federated] Unknown data_split: {split}")
 
     # build clients
-    clients = [Client(ds, config, cid) for cid, ds in enumerate(client_datasets)]
+    clients = [
+        Client(
+            Subset(train_set, idx_list),   
+            config,
+            cid=cid
+        )   
+        for cid, idx_list in client_indices.items()
+    ]
+    
+    for cid, ds in enumerate(clients):
+        assert isinstance(ds.dataset, torch.utils.data.Dataset)
 
     val_loader  = torch.utils.data.DataLoader(val_set,  batch_size=config["batch_size"], shuffle=False)
     test_loader = torch.utils.data.DataLoader(test_set, batch_size=config["batch_size"], shuffle=False)
