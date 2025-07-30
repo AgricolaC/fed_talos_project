@@ -28,14 +28,37 @@ def save_checkpoint(model, optimizer, scheduler, path):
     }, path)
     
 def get_scheduler(optimizer, scheduler_type, config):
+           
+    if config.get("federated", False):
+        # Federated: expect local_steps
+        if "local_steps" not in config:
+            raise KeyError("'local_steps' must be set for federated runs")
+        total_len = config["local_steps"]
+        warmup_epochs = config.get("warmup_epochs_fed", 2)
+    else:
+        # Centralised: expect epochs
+        if "epochs" not in config:
+            raise KeyError("'epochs' must be set for centralised runs")
+        total_len = config["epochs"]
+        warmup_epochs = config.get("warmup_epochs", 5)
+    
     if scheduler_type == "cosine":
-        warmup_epochs = config.get("warmup_epochs", 0)
         if warmup_epochs > 0:
-            main_sched = CosineAnnealingLR(optimizer, T_max=config["epochs"] - warmup_epochs)
-            warmup_sched = LinearLR(optimizer, start_factor=0.1, end_factor=1.0, total_iters=warmup_epochs)
-            return SequentialLR(optimizer, schedulers=[warmup_sched, main_sched], milestones=[warmup_epochs])
+            main_sched   = CosineAnnealingLR(optimizer, T_max=total_len - warmup_epochs)
+            warmup_sched = LinearLR(
+                optimizer,
+                start_factor=0.2,
+                end_factor=1.0,
+                total_iters=warmup_epochs,
+            )
+            return SequentialLR(
+                optimizer,
+                schedulers=[warmup_sched, main_sched],
+                milestones=[warmup_epochs],
+            )
         else:
-            return CosineAnnealingLR(optimizer, T_max=config["epochs"])
+            return CosineAnnealingLR(optimizer, T_max=total_len)
+    
     elif scheduler_type == "step":
         return StepLR(optimizer, step_size=10, gamma=0.5)
     elif scheduler_type == "linear":

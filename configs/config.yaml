@@ -13,6 +13,7 @@ momentum: 0.9
 weight_decay: 0.0005
 scheduler: cosine # options: "cosine", "step", "linear", "none"
 warmup_epochs: 5
+warmup_epochs_fed: 2
 val_split: 0.1
 num_classes: 100
 frozen_backbone: True
