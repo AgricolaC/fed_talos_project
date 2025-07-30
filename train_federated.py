@@ -30,7 +30,7 @@ def train_federated(config):
         raise ValueError(f"[Federated] Unknown data_split: {split}")
 
     # build clients
-    clients = [Client(ds, config, cid) for ds, cid in enumerate(client_datasets)]
+    clients = [Client(ds, config, cid) for cid, ds in enumerate(client_datasets)]
 
     val_loader  = torch.utils.data.DataLoader(val_set,  batch_size=config["batch_size"], shuffle=False)
     test_loader = torch.utils.data.DataLoader(test_set, batch_size=config["batch_size"], shuffle=False)
