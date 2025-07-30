@@ -17,6 +17,16 @@ val_split: 0.1
 num_classes: 100
 frozen_backbone: True
 
+# federated parameters
+federated: true
+rounds: 50
+num_clients: 100
+client_fraction: 0.1
+local_steps: 8
+data_split: iid        # or "noniid"
+classes_per_client: 10  # only used if noniid
+
+
 
 # save and load paths
 data_root: "./data"
