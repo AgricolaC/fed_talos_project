@@ -1,4 +1,3 @@
-import copy
 import torch
 from project_utils.train_utils import save_checkpoint, evaluate
 
@@ -10,56 +9,53 @@ class Server:
         self.test_loader  = test_loader
         self.config       = config
         self.device       = config["device"]
-
-        # keep track
         self.best_val_acc = 0.0
 
+        print(f"[Server] {len(clients)} clients registered")
+        print(f"[Server] Validation size={len(val_loader.dataset)}, Test size={len(test_loader.dataset)}")
+
     def aggregate(self, deltas):
-        """
-        Simple FedAvg: average each tensor delta[k] across clients,
-        then add to global weights.
-        """
-        global_state = self.global_model.state_dict()
+        state = self.global_model.state_dict()
         avg_delta = {}
         K = len(deltas)
-        for k in global_state:
-            stacked = torch.stack([d[k] for d in deltas], dim=0)
+        print(f"[Server] Aggregating updates from {K} clients")
+        for k in state:
+            stacked = torch.stack([d[k].to(self.device) for d in deltas], dim=0)
             avg_delta[k] = stacked.mean(dim=0)
-
-        # apply
-        for k in global_state:
-            global_state[k] = global_state[k] + avg_delta[k]
-        self.global_model.load_state_dict(global_state)
+        for k in state:
+            state[k] = state[k].to(self.device) + avg_delta[k]
+        self.global_model.load_state_dict(state)
 
     def evaluate_global(self, loader):
-        return evaluate(self.global_model, loader, self.device)
+        loss, acc = evaluate(self.global_model, loader, self.device)
+        return loss, acc
 
     def train(self):
-        for rnd in range(self.config["rounds"]):
-            # 1) select a fraction C of clients
-            m = max(1, int(self.config["client_fraction"] * len(self.clients)))
+        rounds = self.config.get("rounds", 1)
+        frac   = self.config.get("client_fraction", 1.0)
+        print(f"[Server] Starting federated training for {rounds} rounds (C={frac:.2f})")
+        for rnd in range(1, rounds+1):
+            m = max(1, int(frac * len(self.clients)))
             selected = torch.randperm(len(self.clients))[:m].tolist()
+            print(f"\n[Round {rnd}] Selected clients: {selected}")
 
             deltas, drifts = [], []
+            base_state = self.global_model.state_dict()
             for idx in selected:
-                delta, drift = self.clients[idx].local_train(self.global_model.state_dict())
-                deltas.append(delta)
-                drifts.append(drift)
+                d, drift = self.clients[idx].local_train(base_state)
+                deltas.append(d); drifts.append(drift)
 
-            # 2) aggregate
+            # aggregate & drift
             self.aggregate(deltas)
-
-            # 3) log client drift
             avg_drift = sum(drifts) / len(drifts)
-            print(f"[Round {rnd+1}] ⟳ avg client L₂‐drift: {avg_drift:.4f}")
+            print(f"[Round {rnd}] → Avg client L2‐drift: {avg_drift:.4f}")
 
-            # 4) validate global model
+            # validate
             val_loss, val_acc = self.evaluate_global(self.val_loader)
-            print(f"[Round {rnd+1}] Validation Acc: {val_acc:.4f}")
-
+            print(f"[Round {rnd}] Validation Acc = {val_acc:.4f} (loss={val_loss:.4f})")
             if val_acc > self.best_val_acc:
                 self.best_val_acc = val_acc
-                print(f"→ New best global model at round {rnd+1}, val acc={val_acc:.4f}")
+                print(f"[Server] ✔ New best global model @round {rnd}: val_acc={val_acc:.4f}")
                 save_checkpoint(
                     self.global_model,
                     optimizer=None,
@@ -69,5 +65,5 @@ class Server:
 
         # final test
         test_loss, test_acc = self.evaluate_global(self.test_loader)
-        print(f"\n FINAL GLOBAL TEST ACC: {test_acc:.4f}")
+        print(f"\n[Server] FINAL GLOBAL TEST  Acc={test_acc:.4f}  Loss={test_loss:.4f}")
         return test_acc
