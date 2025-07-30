@@ -46,26 +46,25 @@ def iid_partition(dataset, num_clients):
     return client_dict
 
 def noniid_partition(dataset, num_clients, nc_per_client):
-    labels = np.array(dataset.dataset.targets)[dataset.indices] if isinstance(dataset, Subset) else dataset.targets
+    labels = np.array(dataset.dataset.targets)[dataset.indices] if isinstance(dataset, Subset) else np.array(dataset.targets)
     data_by_class = defaultdict(list)
-    
+
     for idx, label in enumerate(labels):
         data_by_class[label].append(idx)
-    
-    # Shuffle within each class
-    for label in data_by_class:
-        random.shuffle(data_by_class[label])
-    
-    class_ids = list(data_by_class.keys())
-    random.shuffle(class_ids)
+
+    for cls in data_by_class:
+        random.shuffle(data_by_class[cls])
 
     client_dict = {i: [] for i in range(num_clients)}
-    class_splits = np.array_split(class_ids, num_clients)
+    class_list = list(data_by_class.keys())
 
-    for client_id, class_subset in enumerate(class_splits):
-        for cls in class_subset[:nc_per_client]:
-            num_samples = len(data_by_class[cls]) // (num_clients // len(class_subset))
-            client_dict[client_id].extend(data_by_class[cls][:num_samples])
-            data_by_class[cls] = data_by_class[cls][num_samples:]
+    # Assign classes randomly to clients
+    for client_id in range(num_clients):
+        chosen_classes = random.sample(class_list, nc_per_client)
+        for cls in chosen_classes:
+            num_available = len(data_by_class[cls])
+            take = min(num_available, len(labels) // num_clients // nc_per_client)
+            client_dict[client_id].extend(data_by_class[cls][:take])
+            data_by_class[cls] = data_by_class[cls][take:]
 
     return client_dict
