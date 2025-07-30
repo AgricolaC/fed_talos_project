@@ -24,7 +24,7 @@ rounds: 50
 num_clients: 100
 client_fraction: 0.1
 local_steps: 8
-data_split: iid        # or "noniid"
+data_split: noniid      # or "noniid"
 classes_per_client: 10  # only used if noniid
 
 
