@@ -4,18 +4,36 @@ from project_utils.data_split  import load_cifar100, iid_partition, noniid_parti
 from federated_utils.client   import Client
 from federated_utils.server   import Server
 from project_utils.train_utils import seed_all
+from project_utils.model_registry import MODEL_REGISTRY 
 
 def train_federated(config):
     seed_all(config.get("seed",42))
     # device + model constructor
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    config["device"] = device
-    if "model" not in config or not callable(config["model"]):
+    
+    device = (
+        torch.device("cuda") if torch.cuda.is_available()
+        else torch.device("mps") if torch.backends.mps.is_available()
+        else torch.device("cpu")
+    )
+    print(f"Using device: {device}")
+    
+    model_cfg = config.get("model")
+    
+    if isinstance(model_cfg, str):
+        if model_cfg not in MODEL_REGISTRY:
+            raise KeyError(f"[train_federated] Unknown model string '{model_cfg}'. "
+                       f"Available: {list(MODEL_REGISTRY.keys())}")
+        config["model"] = MODEL_REGISTRY[model_cfg]
+
+    if not callable(config["model"]):
         raise KeyError("[train_federated] config['model'] must be a callable class")
+    
     config["model_constructor"] = lambda: config["model"](
         num_classes     = config["num_classes"],
         frozen_backbone = config.get("frozen_backbone", False)
     )
+    
+    print(f"[Federated] Using model class: {config['model'].__name__}")
 
     print("[Federated] Loading data...")
     train_set, val_set, test_set = load_cifar100(config["data_root"], config["val_split"])
