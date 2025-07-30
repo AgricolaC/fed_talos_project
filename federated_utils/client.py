@@ -58,7 +58,7 @@ class Client:
         # 2) local epochs
         for step in range(self.config["local_steps"]):
             loss, acc = train_one_epoch(model, self.loader, optimizer, self.config["device"])
-            print(f"[Client {self.cid}]  Step {step+1}/{self.config['local_steps']}  loss={loss:.4f} acc={acc:.4f}")
+            # print(f"[Client {self.cid}]  Step {step+1}/{self.config['local_steps']}  loss={loss:.4f} acc={acc:.4f}")
             if scheduler:
                 scheduler.step()
 
